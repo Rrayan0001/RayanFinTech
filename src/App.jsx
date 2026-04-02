@@ -501,6 +501,7 @@ export default function FinanceDashboard() {
   const [mobileNav, setMobileNav] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [showExportMenu, setShowExportMenu] = useState(false);
 
   useEffect(() => {
     if (mainContentRef.current) {
@@ -547,6 +548,18 @@ export default function FinanceDashboard() {
     const rows = filteredTxns.map(tx => `${tx.date},"${tx.description}",${tx.category},${tx.type},${tx.amount}`).join("\n");
     const blob = new Blob([header + rows], { type: "text/csv" });
     const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "transactions.csv"; a.click();
+    setShowExportMenu(false);
+  };
+
+  const exportJSON = () => {
+    const blob = new Blob([JSON.stringify(filteredTxns, null, 2)], { type: "application/json" });
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "transactions.json"; a.click();
+    setShowExportMenu(false);
+  };
+
+  const exportPDF = () => {
+    window.print();
+    setShowExportMenu(false);
   };
 
   const tabs = [
@@ -871,11 +884,34 @@ export default function FinanceDashboard() {
                         color: "#080808", fontWeight: 800, fontSize: 12, cursor: "pointer", fontFamily: "Oswald",
                       }}>{Icons.plus("#080808")} Add Transaction</button>
                     )}
-                    <button onClick={exportCSV} style={{
-                      display: "flex", alignItems: "center", gap: 7, padding: "9px 16px", borderRadius: 12,
-                      border: `1px solid ${t.green}`, backgroundColor: "transparent",
-                      color: t.green, fontWeight: 700, fontSize: 12, cursor: "pointer", fontFamily: "Oswald",
-                    }}>{Icons.download(t.green)} Export Report</button>
+                    <div style={{ position: "relative" }}>
+                      <button onClick={() => setShowExportMenu(!showExportMenu)} style={{
+                        display: "flex", alignItems: "center", gap: 7, padding: "9px 16px", borderRadius: 12,
+                        border: `1px solid ${t.green}`, backgroundColor: "transparent",
+                        color: t.green, fontWeight: 700, fontSize: 12, cursor: "pointer", fontFamily: "Oswald",
+                      }}>{Icons.download(t.green)} Export Report</button>
+                      
+                      {showExportMenu && (
+                        <div style={{
+                          position: "absolute", top: "100%", right: 0, marginTop: 8,
+                          backgroundColor: t.card, border: `1px solid ${t.border}`, borderRadius: 12,
+                          boxShadow: t.shadow, zIndex: 100, minWidth: 140, overflow: "hidden"
+                        }}>
+                          {[
+                            { label: "Export as CSV", onClick: exportCSV },
+                            { label: "Export as JSON", onClick: exportJSON },
+                            { label: "Print / PDF", onClick: exportPDF }
+                          ].map(opt => (
+                            <div key={opt.label} onClick={opt.onClick} style={{
+                              padding: "10px 16px", fontSize: 13, fontWeight: 600, color: t.textSec,
+                              cursor: "pointer", transition: "all 0.2s", fontFamily: "Inter"
+                            }} onMouseEnter={e => { e.currentTarget.style.backgroundColor = t.hover; e.currentTarget.style.color = t.text; }} onMouseLeave={e => { e.currentTarget.style.backgroundColor = "transparent"; e.currentTarget.style.color = t.textSec; }}>
+                              {opt.label}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
 
