@@ -86,6 +86,16 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: 'Oswald', sans-serif !important;
+    font-family: 'Instrument Sans', sans-serif !important;
+  }
+
+  /* Hide number input arrows (spin buttons) */
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type=number] {
+    -moz-appearance: textfield;
   }
 }
