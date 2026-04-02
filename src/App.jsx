@@ -487,12 +487,6 @@ function InsightsSection({ txns, t }) {
 export default function FinanceDashboard() {
   const mainContentRef = useRef(null);
 
-  useEffect(() => {
-    if (mainContentRef.current) {
-      mainContentRef.current.scrollTo(0, 0);
-    }
-  }, [activeTab]);
-
   const [isDark, setIsDark] = useState(true);
   const [role, setRole] = useState("admin");
   const [txns, setTxns] = useState(INITIAL_TXNS);
@@ -507,6 +501,12 @@ export default function FinanceDashboard() {
   const [mobileNav, setMobileNav] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    if (mainContentRef.current) {
+      mainContentRef.current.scrollTo(0, 0);
+    }
+  }, [activeTab]);
 
   const t = isDark ? DARK : LIGHT;
   const isAdmin = role === "admin";
