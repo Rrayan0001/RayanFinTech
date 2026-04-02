@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 
 /* ══════════════════════════════════════════
    MOCK DATA GENERATION
@@ -488,6 +488,14 @@ function InsightsSection({ txns, t }) {
    MAIN DASHBOARD
    ══════════════════════════════════════════ */
 export default function FinanceDashboard() {
+  const mainContentRef = useRef(null);
+
+  useEffect(() => {
+    if (mainContentRef.current) {
+      mainContentRef.current.scrollTo(0, 0);
+    }
+  }, [activeTab]);
+
   const [isDark, setIsDark] = useState(true);
   const [role, setRole] = useState("admin");
   const [txns, setTxns] = useState(INITIAL_TXNS);
@@ -841,7 +849,7 @@ export default function FinanceDashboard() {
         <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", position: "relative" }}>
           
           {/* MAIN SCROLLABLE CONTENT AREA */}
-          <div className="main-content-area" style={{ flex: 1, overflowY: "auto", backgroundColor: t.bg }}>
+          <div ref={mainContentRef} className="main-content-area" style={{ flex: 1, overflowY: "auto", backgroundColor: t.bg }}>
             
             {/* Page Title inside content area */}
             <div className="desk" style={{ marginBottom: 40, display: "flex", alignItems: "center", gap: 20 }}>
