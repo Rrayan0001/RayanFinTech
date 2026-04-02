@@ -148,9 +148,6 @@ function SummaryCard({ title, value, subtitle, icon, color, soft, delay, t }) {
       }}>
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 16 }}>
         <div style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: soft, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{icon}</div>
-        <div style={{ color: t.textMuted, opacity: 0.5, cursor: "pointer" }}>
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="3" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="8" cy="13" r="1.5"/></svg>
-        </div>
       </div>
       <div style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "1.5px", color: t.textSec, marginBottom: 6 }}>{title}</div>
       <div style={{ fontSize: 30, fontWeight: 900, color: color, letterSpacing: "-1px", lineHeight: 1.1, marginBottom: 8 }}>{value}</div>
