@@ -1470,7 +1470,7 @@ export default function FinanceDashboard() {
           />
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <span onClick={() => setIsDark(!isDark)} style={{ color: t.textSec, cursor: "pointer", display: "flex", alignItems: "center", padding: 6 }}>
-              {isDark ? Icons.sun() : Icons.moon()}
+              {isDark ? Icons.sun : Icons.moon}
             </span>
             <span onClick={() => setShowExportModal(true)} style={{ color: t.green, cursor: "pointer", display: "flex", alignItems: "center", padding: 6, border: `1px solid ${t.green}33`, borderRadius: 8 }}>
               {Icons.download(t.green)}
