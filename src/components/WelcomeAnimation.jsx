@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import welcomeAnimationLogo from '../../welcome_animation_logo.png';
 
 /* ═══════════════════════════════════════════════
    WELCOME ANIMATION — RayanFinTech
@@ -142,7 +143,7 @@ export default function WelcomeAnimation({ onComplete, animationSpeed = 1 }) {
           transition: 'filter 0.8s ease',
         }}>
           <img
-            src="/logo.png"
+            src={welcomeAnimationLogo}
             alt="Logo"
             style={{
               width: '180px', height: '180px',

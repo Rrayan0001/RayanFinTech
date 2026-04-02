@@ -5,7 +5,7 @@ import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 /* ══════════════════════════════════════════
    MOCK DATA GENERATION
    ══════════════════════════════════════════ */
-const EXPENSE_CATS = ["Food & Dining", "Transport", "Shopping", "Entertainment", "Bills & Utilities", "Healthcare", "Education"];
+const EXPENSE_CATS = ["Food & Dining", "Transport", "Shopping", "Entertainment", "Bills & Utilities", "Healthcare", "Education", "Others"];
 const INCOME_CATS = ["Salary", "Freelance", "Investments"];
 const ALL_CATS = [...EXPENSE_CATS, ...INCOME_CATS];
 
@@ -17,6 +17,7 @@ const DESC_MAP = {
   "Bills & Utilities": ["Electricity Bill", "WiFi Bill", "Mobile Recharge", "Water Bill", "Gas Bill"],
   "Healthcare": ["Apollo Pharmacy", "Doctor Visit", "Lab Tests", "Insurance", "Gym"],
   "Education": ["Udemy Course", "Books", "Coursera", "Workshop", "Exam Fee"],
+  "Others": ["Misc Expense", "General Purchase", "Unexpected Cost", "Cash Payment", "Other Expense"],
   "Salary": ["Monthly Salary", "Bonus", "Incentive"],
   "Freelance": ["Client Payment", "Project Fee", "Consulting"],
   "Investments": ["MF Returns", "Dividend", "FD Interest", "Rental Income"],
@@ -60,6 +61,24 @@ function generateTransactions() {
 
 const INITIAL_TXNS = generateTransactions();
 
+const TAB_ROUTES = {
+  overview: "/",
+  transactions: "/transactions",
+  insights: "/insights",
+  settings: "/settings",
+};
+
+const normalizePath = (pathname = "/") => {
+  if (!pathname || pathname === "/") return "/";
+  return pathname.endsWith("/") ? pathname.slice(0, -1) || "/" : pathname;
+};
+
+const getTabFromPath = (pathname = "/") => {
+  const normalized = normalizePath(pathname);
+  const match = Object.entries(TAB_ROUTES).find(([, route]) => route === normalized);
+  return match ? match[0] : "overview";
+};
+
 /* ══════════════════════════════════════════
    THEMES
    ══════════════════════════════════════════ */
@@ -101,7 +120,7 @@ const Icons = {
   list: (c) => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round"><line x1="8" y1="6" x2="21" y2="6" /><line x1="8" y1="12" x2="21" y2="12" /><line x1="8" y1="18" x2="21" y2="18" /><circle cx="4" cy="6" r="1" fill={c} /><circle cx="4" cy="12" r="1" fill={c} /><circle cx="4" cy="18" r="1" fill={c} /></svg>,
   heart: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>,
   calendar: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>,
-  diamond: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 3h12l4 6-10 13L2 9Z"></path><path d="M11 3 8 9l4 13"></path><path d="M12 3v13"></path></svg>,
+  diamond: (c) => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 3h12l4 6-10 13L2 9Z"></path><path d="M11 3 8 9l4 13"></path><path d="M12 3v13"></path></svg>,
   settings: (c) => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg>,
   box: (c) => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>,
   sliders: (c) => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>,
@@ -253,7 +272,14 @@ function BalanceTrend({ txns, t, fmt, isMobile, variant = "default" }) {
           { label: "Lowest Balance", value: fmt(lowestMonth.balance), sub: `${lowestMonth.month} ${lowestMonth.year}`, color: t.orange, icon: Icons.trendDown(t.orange) },
           { label: "Average Balance", value: fmt(avgBalance), sub: `Last ${monthlyData.length} Months`, color: t.text, icon: Icons.wallet(t.text) },
         ].map((s, i) => (
-          <div key={i} style={{ background: isBoxless ? t.cardAlt || t.surface : t.surface, borderRadius: 14, padding: isBoxless ? "12px 12px" : "10px 12px", border: `1px solid ${t.border}`, borderTop: "none" }}>
+          <div key={i} style={{
+            background: isBoxless ? t.cardAlt || t.surface : t.surface,
+            borderRadius: 14,
+            padding: isBoxless ? "12px 12px" : "10px 12px",
+            borderStyle: "solid",
+            borderColor: t.border,
+            borderWidth: "0 1px 1px 1px"
+          }}>
             <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
               <span style={{ width: 20, height: 20, borderRadius: 6, backgroundColor: s.color + '22', color: s.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900 }}>{s.icon}</span>
               <span style={{ fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: "1px", color: t.textMuted }}>{s.label}</span>
@@ -331,9 +357,16 @@ function SpendingDonut({ txns, t, fmt, CAT_COLORS, isMobile, variant = "default"
         {[
           { label: "Categories", value: data.length, sub: "Tracked", color: t.text, icon: Icons.box(t.text) },
           { label: "Avg / Category", value: fmt(avgPerCat), sub: "Per category", color: t.green, icon: Icons.chart(t.green) },
-          { label: "Top Category", value: `${Math.round((maxCat.val / total) * 100)}%`, sub: maxCat.cat, color: CAT_COLORS[maxCat.cat] || t.orange, icon: Icons.diamond },
+          { label: "Top Category", value: `${Math.round((maxCat.val / total) * 100)}%`, sub: maxCat.cat, color: CAT_COLORS[maxCat.cat] || t.orange, icon: Icons.diamond(CAT_COLORS[maxCat.cat] || t.orange) },
         ].map((s, i) => (
-          <div key={i} style={{ background: isBoxless ? t.cardAlt || t.surface : t.surface, borderRadius: 14, padding: isBoxless ? "12px 12px" : "10px 12px", border: `1px solid ${t.border}`, borderTop: "none" }}>
+          <div key={i} style={{
+            background: isBoxless ? t.cardAlt || t.surface : t.surface,
+            borderRadius: 14,
+            padding: isBoxless ? "12px 12px" : "10px 12px",
+            borderStyle: "solid",
+            borderColor: t.border,
+            borderWidth: "0 1px 1px 1px"
+          }}>
             <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
               <span style={{ fontSize: 12 }}>{s.icon}</span>
               <span style={{ fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: "1px", color: t.textMuted }}>{s.label}</span>
@@ -472,8 +505,126 @@ function StatusMarquee({ txns, userSettings, t, fmt, isMobile }) {
   );
 }
 
+function RolePinModal({ t, isMobile, onClose, onUnlock }) {
+  const [pin, setPin] = useState("");
+  const [error, setError] = useState("");
+  const demoPin = "2026";
+
+  const submit = () => {
+    if (pin === demoPin) {
+      onUnlock();
+      setPin("");
+      setError("");
+      return;
+    }
+    setError("Incorrect PIN. Use the demo PIN shown below.");
+  };
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        backgroundColor: "rgba(0,0,0,0.6)",
+        zIndex: 1100,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: 16,
+      }}
+      onClick={onClose}
+    >
+      <div
+        style={{
+          width: "100%",
+          maxWidth: 360,
+          backgroundColor: t.card,
+          border: `1px solid ${t.border}`,
+          borderRadius: isMobile ? 18 : 20,
+          boxShadow: t.shadow,
+          padding: isMobile ? 20 : 24,
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h3 style={{ margin: "0 0 8px", color: t.text, fontSize: 20, fontWeight: 800 }}>Admin PIN Required</h3>
+        <p style={{ margin: "0 0 16px", color: t.textMuted, fontSize: 13, lineHeight: 1.5 }}>
+          Enter the demo PIN to unlock admin actions for this frontend role switch.
+        </p>
+        <div style={{ marginBottom: 14 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "1px", color: t.textMuted, marginBottom: 8 }}>
+            PIN
+          </div>
+          <input
+            type="password"
+            inputMode="numeric"
+            value={pin}
+            onChange={(e) => {
+              setPin(e.target.value);
+              if (error) setError("");
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") submit();
+            }}
+            placeholder="Enter PIN"
+            style={{
+              width: "100%",
+              padding: "12px 14px",
+              borderRadius: 12,
+              border: `1px solid ${error ? t.red : t.border}`,
+              backgroundColor: t.inputBg,
+              color: t.text,
+              outline: "none",
+              fontSize: 15,
+              fontWeight: 600,
+            }}
+          />
+        </div>
+        <div style={{ fontSize: 12, color: error ? t.red : t.textMuted, marginBottom: 16 }}>
+          {error || "Demo PIN: 2026"}
+        </div>
+        <div style={{ display: "flex", gap: 10, flexDirection: isMobile ? "column-reverse" : "row" }}>
+          <button
+            onClick={onClose}
+            style={{
+              flex: 1,
+              padding: "11px",
+              borderRadius: 12,
+              border: `1px solid ${t.border}`,
+              backgroundColor: "transparent",
+              color: t.textSec,
+              fontSize: 13,
+              fontWeight: 700,
+              cursor: "pointer",
+            }}
+          >
+            Cancel
+          </button>
+          <button
+            onClick={submit}
+            style={{
+              flex: 1,
+              padding: "11px",
+              borderRadius: 12,
+              border: "none",
+              background: `linear-gradient(135deg, ${t.gradientFrom}, ${t.gradientTo})`,
+              color: "#080808",
+              fontSize: 13,
+              fontWeight: 800,
+              cursor: "pointer",
+            }}
+          >
+            Unlock Admin
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function AddModal({ onAdd, onClose, t, editTxn, currencySymbol, isMobile }) {
+  const today = new Date().toISOString().slice(0, 10);
   const [form, setForm] = useState(editTxn || { description: "", amount: "", category: EXPENSE_CATS[0], type: "expense", date: new Date().toISOString().slice(0, 10) });
+  const [error, setError] = useState("");
   const upd = (k, v) => setForm(p => ({ ...p, [k]: v }));
   const cats = form.type === "income" ? INCOME_CATS : EXPENSE_CATS;
 
@@ -481,9 +632,26 @@ function AddModal({ onAdd, onClose, t, editTxn, currencySymbol, isMobile }) {
     if (!cats.includes(form.category)) upd("category", cats[0]);
   }, [form.type]);
 
+  useEffect(() => {
+    if (Number(form.amount) < 0) upd("amount", "0");
+    if (form.date > today) upd("date", today);
+  }, [form.amount, form.date, today]);
+
   const submit = () => {
-    if (!form.description || !form.amount || !form.date) return;
-    onAdd({ ...form, amount: parseFloat(form.amount), id: editTxn?.id || `t-new-${Date.now()}` });
+    const parsedAmount = Number(form.amount);
+    if (!form.description || form.amount === "" || !form.date) {
+      setError("Please fill in all required fields.");
+      return;
+    }
+    if (!Number.isFinite(parsedAmount) || parsedAmount < 0) {
+      setError("Amount cannot be negative.");
+      return;
+    }
+    if (form.date > today) {
+      setError("Future dates are not allowed.");
+      return;
+    }
+    onAdd({ ...form, amount: parsedAmount, id: editTxn?.id || `t-new-${Date.now()}` });
     onClose();
   };
 
@@ -521,17 +689,18 @@ function AddModal({ onAdd, onClose, t, editTxn, currencySymbol, isMobile }) {
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div><label style={labelStyle}>Description</label><input style={inputStyle} value={form.description} onChange={e => upd("description", e.target.value)} placeholder="e.g. Swiggy Order" /></div>
+          <div><label style={labelStyle}>Description</label><input style={inputStyle} value={form.description} onChange={e => { upd("description", e.target.value); if (error) setError(""); }} placeholder="e.g. Swiggy Order" /></div>
           <div style={{ display: "flex", gap: 12, flexDirection: isMobile ? "column" : "row" }}>
-            <div style={{ flex: 1 }}><label style={labelStyle}>Amount ({currencySymbol})</label><input style={inputStyle} type="number" value={form.amount} onChange={e => upd("amount", e.target.value)} placeholder="0" /></div>
-            <div style={{ flex: 1 }}><label style={labelStyle}>Date</label><input style={inputStyle} type="date" value={form.date} onChange={e => upd("date", e.target.value)} /></div>
+            <div style={{ flex: 1 }}><label style={labelStyle}>Amount ({currencySymbol})</label><input style={inputStyle} type="number" min="0" step="0.01" value={form.amount} onChange={e => { upd("amount", e.target.value === "" ? "" : String(Math.max(0, Number(e.target.value)))); if (error) setError(""); }} placeholder="0" /></div>
+            <div style={{ flex: 1 }}><label style={labelStyle}>Date</label><input style={inputStyle} type="date" max={today} value={form.date} onChange={e => { upd("date", e.target.value > today ? today : e.target.value); if (error) setError(""); }} /></div>
           </div>
           <div><label style={labelStyle}>Category</label>
-            <select style={{ ...inputStyle, appearance: "auto" }} value={form.category} onChange={e => upd("category", e.target.value)}>
+            <select style={{ ...inputStyle, appearance: "auto" }} value={form.category} onChange={e => { upd("category", e.target.value); if (error) setError(""); }}>
               {cats.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
         </div>
+        {error && <div style={{ marginTop: 12, fontSize: 12, color: t.red, fontWeight: 600 }}>{error}</div>}
 
         <button onClick={submit} style={{
           width: "100%", padding: "13px", borderRadius: 12, border: "none", marginTop: 24,
@@ -760,33 +929,33 @@ const SettingsView = ({ userSettings, setUserSettings, t, Icons, txns, setTxns, 
   };
 
   const sectionLabel = (txt) => (
-    <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "1px", color: t.textMuted, marginBottom: 12, marginTop: 24 }}>{txt}</div>
+    <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "1px", color: t.textMuted, marginBottom: isMobile ? 10 : 12, marginTop: isMobile ? 18 : 24 }}>{txt}</div>
   );
 
   const settingRow = (label, desc, action) => (
-    <div style={{ display: "flex", alignItems: isMobile ? "stretch" : "center", justifyContent: "space-between", flexDirection: isMobile ? "column" : "row", gap: isMobile ? 12 : 0, padding: "16px 0", borderBottom: `1px solid ${t.border}` }}>
+    <div style={{ display: "flex", alignItems: isMobile ? "stretch" : "center", justifyContent: "space-between", flexDirection: isMobile ? "column" : "row", gap: isMobile ? 10 : 0, padding: isMobile ? "12px 0" : "16px 0", borderBottom: `1px solid ${t.border}` }}>
       <div style={{ paddingRight: isMobile ? 0 : 20 }}>
         <div style={{ fontSize: 14, fontWeight: 600, color: t.text }}>{label}</div>
-        <div style={{ fontSize: 12, color: t.textMuted, marginTop: 2 }}>{desc}</div>
+        <div style={{ fontSize: isMobile ? 11 : 12, color: t.textMuted, marginTop: 2 }}>{desc}</div>
       </div>
       <div style={{ flexShrink: 0, width: isMobile ? "100%" : "auto" }}>{action}</div>
     </div>
   );
 
   return (
-    <div style={{ animation: "fadeSlideIn 0.4s ease", display: "flex", gap: isMobile ? 16 : 32, height: "100%", flexDirection: isMobile ? 'column' : 'row' }}>
+    <div style={{ animation: "fadeSlideIn 0.4s ease", display: "flex", gap: isMobile ? 12 : 32, flexDirection: isMobile ? 'column' : 'row', alignItems: "flex-start" }}>
       {/* Settings Navigation */}
-      <div style={{ width: isMobile ? '100%' : 220, display: "flex", flexDirection: isMobile ? 'row' : 'column', gap: 4, overflowX: isMobile ? 'auto' : 'hidden', paddingBottom: isMobile ? 10 : 0 }}>
+      <div style={{ width: isMobile ? '100%' : 220, display: "flex", flexDirection: isMobile ? 'row' : 'column', gap: 4, overflowX: isMobile ? 'auto' : 'hidden', paddingBottom: isMobile ? 6 : 0 }}>
         {cats.map(c => (
           <button
             key={c.id}
             onClick={() => setActiveCat(c.id)}
             style={{
-              display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", borderRadius: 12, border: "none",
+              display: "flex", alignItems: "center", gap: isMobile ? 8 : 12, padding: isMobile ? "10px 12px" : "12px 16px", borderRadius: 12, border: "none",
               backgroundColor: activeCat === c.id ? t.greenSoft : "transparent",
               color: activeCat === c.id ? t.green : t.textSec,
               cursor: "pointer", textAlign: "left", transition: "all 0.2s",
-              fontSize: 14, fontWeight: activeCat === c.id ? 700 : 500, fontFamily: "Oswald",
+              fontSize: isMobile ? 13 : 14, fontWeight: activeCat === c.id ? 700 : 500, fontFamily: "Oswald",
               flexShrink: 0
             }}
           >
@@ -797,9 +966,9 @@ const SettingsView = ({ userSettings, setUserSettings, t, Icons, txns, setTxns, 
       </div>
 
       {/* Settings Content */}
-      <div style={{ flex: 1, backgroundColor: t.card, borderRadius: 20, border: `1px solid ${t.border}`, padding: isMobile ? 20 : 32, overflowY: isMobile ? "visible" : "auto", boxShadow: t.shadow }}>
-        <h2 style={{ fontFamily: "Oswald", fontSize: 24, fontWeight: 700, margin: "0 0 8px 0", color: t.text }}>{cats.find(c => c.id === activeCat).label} Settings</h2>
-        <p style={{ fontSize: 13, color: t.textMuted, margin: 0 }}>Manage your preferences and system configuration.</p>
+      <div style={{ flex: isMobile ? "1 1 auto" : "0 1 860px", maxWidth: isMobile ? "100%" : 860, width: "100%", backgroundColor: t.card, borderRadius: isMobile ? 16 : 20, border: `1px solid ${t.border}`, padding: isMobile ? 14 : 28, overflowY: "visible", boxShadow: t.shadow }}>
+        <h2 style={{ fontFamily: "Oswald", fontSize: isMobile ? 18 : 24, fontWeight: 700, margin: "0 0 6px 0", color: t.text }}>{cats.find(c => c.id === activeCat).label} Settings</h2>
+        <p style={{ fontSize: isMobile ? 12 : 13, color: t.textMuted, margin: 0 }}>Manage your preferences and system configuration.</p>
 
         {activeCat === 'general' && (
           <div>
@@ -950,7 +1119,9 @@ export default function FinanceDashboard() {
   }, [isDark]);
   const [role, setRole] = useState("admin");
   const [txns, setTxns] = useState(INITIAL_TXNS);
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState(() =>
+    typeof window !== "undefined" ? getTabFromPath(window.location.pathname) : "overview"
+  );
   const [search, setSearch] = useState("");
   const [filterCat, setFilterCat] = useState("All");
   const [filterType, setFilterType] = useState("All");
@@ -962,6 +1133,7 @@ export default function FinanceDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
+  const [showRolePinModal, setShowRolePinModal] = useState(false);
   const [isMobile, setIsMobile] = useState(() =>
     typeof window !== "undefined" ? window.innerWidth <= 768 : false
   );
@@ -997,6 +1169,17 @@ export default function FinanceDashboard() {
   }, [userSettings]);
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const handlePopState = () => {
+      setActiveTab(getTabFromPath(window.location.pathname));
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
+
+  useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 768);
     handleResize();
     window.addEventListener("resize", handleResize);
@@ -1023,25 +1206,25 @@ export default function FinanceDashboard() {
     Emerald: {
       "Food & Dining": "#f5a623", "Transport": "#4fc3f7", "Shopping": "#e040fb",
       "Entertainment": "#ff7043", "Bills & Utilities": "#78909c",
-      "Healthcare": "#ef5350", "Education": "#66bb6a",
+      "Healthcare": "#ef5350", "Education": "#66bb6a", "Others": "#9e9e9e",
       "Salary": "#7ed957", "Freelance": "#c8ff00", "Investments": "#ffd740",
     },
     Gold: {
       "Food & Dining": "#D4AF37", "Transport": "#C5B358", "Shopping": "#CFB53B",
       "Entertainment": "#B8860B", "Bills & Utilities": "#996515",
-      "Healthcare": "#8B4513", "Education": "#A0522D",
+      "Healthcare": "#8B4513", "Education": "#A0522D", "Others": "#8d8070",
       "Salary": "#FFD700", "Freelance": "#EEE8AA", "Investments": "#FAFAD2",
     },
     Indigo: {
       "Food & Dining": "#4B0082", "Transport": "#483D8B", "Shopping": "#6A5ACD",
       "Entertainment": "#7B68EE", "Bills & Utilities": "#8470FF",
-      "Healthcare": "#000080", "Education": "#00008B",
+      "Healthcare": "#000080", "Education": "#00008B", "Others": "#6b7280",
       "Salary": "#4682B4", "Freelance": "#5F9EA0", "Investments": "#B0C4DE",
     }
   }[userSettings.palette] || {
     "Food & Dining": "#f5a623", "Transport": "#4fc3f7", "Shopping": "#e040fb",
     "Entertainment": "#ff7043", "Bills & Utilities": "#78909c",
-    "Healthcare": "#ef5350", "Education": "#66bb6a",
+    "Healthcare": "#ef5350", "Education": "#66bb6a", "Others": "#9e9e9e",
     "Salary": "#7ed957", "Freelance": "#c8ff00", "Investments": "#ffd740",
   };
 
@@ -1051,8 +1234,41 @@ export default function FinanceDashboard() {
     }
   }, [activeTab]);
 
+  const navigateToTab = useCallback((tab, options = {}) => {
+    const { replace = false } = options;
+    const nextTab = TAB_ROUTES[tab] ? tab : "overview";
+    const nextPath = TAB_ROUTES[nextTab];
+
+    setActiveTab(nextTab);
+
+    if (typeof window === "undefined") return;
+    if (normalizePath(window.location.pathname) === nextPath) return;
+
+    const method = replace ? "replaceState" : "pushState";
+    window.history[method]({ tab: nextTab }, "", nextPath);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const normalizedPath = normalizePath(window.location.pathname);
+    const expectedPath = TAB_ROUTES[activeTab] || "/";
+
+    if (normalizedPath !== expectedPath) {
+      window.history.replaceState({ tab: activeTab }, "", expectedPath);
+    }
+  }, [activeTab]);
+
   const t = isDark ? DARK : LIGHT;
   const isAdmin = role === "admin";
+
+  const handleRoleToggle = useCallback(() => {
+    if (role === "admin") {
+      setRole("viewer");
+      return;
+    }
+    setShowRolePinModal(true);
+  }, [role]);
 
   useEffect(() => { setTimeout(() => setMounted(true), 50); }, []);
 
@@ -1245,7 +1461,7 @@ export default function FinanceDashboard() {
           .mobile-full-width { width: 100% !important; }
           .app-container { height: 100vh !important; border-radius: 0 !important; max-width: 100% !important; border: none !important; }
           .main-sidebar { display: none !important; }
-          .main-content-area { padding: 84px 14px 106px 14px !important; }
+          .main-content-area { padding: 84px 14px 118px 14px !important; }
           .mob-top-bar { 
              display: flex; position: fixed; top: 0; left: 0; right: 0; min-height: 64px; 
              background-color: ${t.surface}; border-bottom: 1px solid ${t.border}; 
@@ -1253,10 +1469,16 @@ export default function FinanceDashboard() {
              backdrop-filter: blur(14px);
           }
           .mob-bottom-bar {
-             display: flex; position: fixed; bottom: 0; left: 0; right: 0; min-height: 74px;
-             background-color: ${t.surface}; border-top: 1px solid ${t.border};
-             z-index: 100; align-items: center; justify-content: space-around; padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
-             backdrop-filter: blur(14px);
+             display: flex; position: fixed; left: 14px; right: 14px; bottom: calc(10px + env(safe-area-inset-bottom));
+             min-height: 64px;
+             z-index: 120; align-items: center; justify-content: space-between;
+             padding: 6px;
+             border-radius: 999px;
+             border: 1px solid ${isDark ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.65)"};
+             background: ${isDark ? "rgba(26,26,26,0.56)" : "rgba(255,255,255,0.58)"};
+             backdrop-filter: blur(22px) saturate(180%);
+             -webkit-backdrop-filter: blur(22px) saturate(180%);
+             box-shadow: ${isDark ? "0 16px 40px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.08)" : "0 18px 40px rgba(89,104,58,0.14), inset 0 1px 0 rgba(255,255,255,0.8)"};
           }
           .mobile-page-title { display: block; margin-bottom: 18px; }
           .table-responsive { overflow-x: auto; width: 100%; -webkit-overflow-scrolling: touch; }
@@ -1303,7 +1525,7 @@ export default function FinanceDashboard() {
             <img
               src={isDark ? "/dark_theme_logo.png" : "/light_theme_logo.png"}
               alt="RayanFinTech Logo"
-              onClick={() => setActiveTab("overview")}
+              onClick={() => navigateToTab("overview")}
               style={{
                 height: 38,
                 width: sidebarOpen ? 182 : 44,
@@ -1328,7 +1550,7 @@ export default function FinanceDashboard() {
                 <button
                   key={item.id}
                   className="sidebar-nav-item"
-                  onClick={() => setActiveTab(item.id)}
+                  onClick={() => navigateToTab(item.id)}
                   style={{
                     display: "flex", alignItems: "center",
                     gap: 16,
@@ -1413,7 +1635,7 @@ export default function FinanceDashboard() {
             {/* Role Toggle */}
             <button
               className="sidebar-nav-item"
-              onClick={() => setRole(role === 'admin' ? 'viewer' : 'admin')}
+              onClick={handleRoleToggle}
               style={{
                 display: "flex", alignItems: "center", gap: 16,
                 padding: "12px",
@@ -1436,7 +1658,7 @@ export default function FinanceDashboard() {
             {/* Settings Toggle */}
             <button
               className="sidebar-nav-item"
-              onClick={() => setActiveTab("settings")}
+              onClick={() => navigateToTab("settings")}
               style={{
                 display: "flex", alignItems: "center", gap: 16,
                 padding: "12px",
@@ -1465,10 +1687,27 @@ export default function FinanceDashboard() {
           <img
             src={isDark ? "/dark_theme_logo.png" : "/light_theme_logo.png"}
             alt="RayanFinTech"
-            onClick={() => setActiveTab("overview")}
+            onClick={() => navigateToTab("overview")}
             style={{ height: 26, objectFit: "contain", cursor: "pointer", maxWidth: 142 }}
           />
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <span
+              onClick={handleRoleToggle}
+              title={role === "admin" ? "Switch to Viewer" : "Unlock Admin"}
+              style={{
+                color: role === "admin" ? t.green : t.textSec,
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: 6,
+                border: `1px solid ${role === "admin" ? t.green + "55" : t.border}`,
+                borderRadius: 8,
+                backgroundColor: role === "admin" ? t.greenSoft : "transparent",
+              }}
+            >
+              {Icons.user(role === "admin" ? t.green : t.textSec)}
+            </span>
             <span onClick={() => setIsDark(!isDark)} style={{ color: t.textSec, cursor: "pointer", display: "flex", alignItems: "center", padding: 6 }}>
               {isDark ? Icons.sun : Icons.moon}
             </span>
@@ -1488,16 +1727,66 @@ export default function FinanceDashboard() {
         <div className="mob-bottom-bar">
           {tabs.map(tab => {
             const isActive = activeTab === tab.id;
+            const iconColor = isActive ? t.green : (isDark ? "rgba(255,255,255,0.72)" : "rgba(22,24,19,0.68)");
             return (
-              <div key={tab.id} onClick={() => setActiveTab(tab.id)} style={{
-                display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4, cursor: "pointer", color: isActive ? t.green : t.textMuted, width: "25%"
-              }}>
-                {tab.id === "overview" && Icons.box(isActive ? t.green : t.textMuted)}
-                {tab.id === "transactions" && Icons.sliders(isActive ? t.green : t.textMuted)}
-                {tab.id === "insights" && Icons.lightbulb(isActive ? t.green : t.textMuted)}
-                {tab.id === "settings" && Icons.settings(isActive ? t.green : t.textMuted)}
-                <span style={{ fontSize: 10, fontWeight: isActive ? 700 : 500, fontFamily: "Oswald" }}>{tab.label}</span>
-              </div>
+              <button
+                key={tab.id}
+                onClick={() => navigateToTab(tab.id)}
+                style={{
+                  flex: isActive ? "1.18 1 0" : "0.95 1 0",
+                  minWidth: 0,
+                  minHeight: 52,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: isActive ? 8 : 0,
+                  padding: isActive ? "0 14px" : "0 10px",
+                  borderRadius: 999,
+                  border: "none",
+                  background: isActive
+                    ? (isDark
+                      ? "linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.06))"
+                      : "linear-gradient(180deg, rgba(255,255,255,0.96), rgba(248,251,244,0.78))")
+                    : "transparent",
+                  boxShadow: isActive
+                    ? (isDark
+                      ? "inset 0 1px 0 rgba(255,255,255,0.12), inset 0 -8px 18px rgba(255,255,255,0.03), 0 8px 20px rgba(0,0,0,0.16)"
+                      : "inset 0 1px 0 rgba(255,255,255,0.95), 0 8px 18px rgba(112,130,72,0.14)")
+                    : "none",
+                  color: iconColor,
+                  cursor: "pointer",
+                  transition: "all .22s ease"
+                }}
+              >
+                <span style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: isActive ? 26 : 24,
+                  height: isActive ? 26 : 24,
+                  color: iconColor,
+                  transition: "all .22s ease"
+                }}>
+                  {tab.id === "overview" && Icons.box(iconColor)}
+                  {tab.id === "transactions" && Icons.sliders(iconColor)}
+                  {tab.id === "insights" && Icons.lightbulb(iconColor)}
+                  {tab.id === "settings" && Icons.settings(iconColor)}
+                </span>
+                <span style={{
+                  maxWidth: isActive ? 78 : 0,
+                  overflow: "hidden",
+                  whiteSpace: "nowrap",
+                  opacity: isActive ? 1 : 0,
+                  transform: `translateX(${isActive ? "0" : "-4px"})`,
+                  fontSize: 12,
+                  fontWeight: 700,
+                  letterSpacing: "0.01em",
+                  color: isActive ? (isDark ? "#F5F7F0" : "#18210E") : "transparent",
+                  transition: "all .22s ease"
+                }}>
+                  {tab.label}
+                </span>
+              </button>
             );
           })}
         </div>
@@ -1592,7 +1881,7 @@ export default function FinanceDashboard() {
                           }
                         </p>
                       </div>
-                      <button onClick={() => setActiveTab("insights")} style={{
+                      <button onClick={() => navigateToTab("insights")} style={{
                         display: "flex", alignItems: "center", gap: 6, padding: "8px 14px", borderRadius: 10, border: `1px solid ${isPositive ? t.green : t.orange}`,
                         backgroundColor: "transparent", color: isPositive ? t.green : t.orange, fontWeight: 700, fontSize: 11, cursor: "pointer", fontFamily: "Oswald", whiteSpace: "nowrap", justifyContent: "center", width: isMobile ? "100%" : "auto",
                       }}>{Icons.sliders(isPositive ? t.green : t.orange)} View Detailed Report</button>
@@ -1795,6 +2084,17 @@ export default function FinanceDashboard() {
             editTxn={editTxn}
             currencySymbol={userSettings.currency === 'INR' ? '₹' : userSettings.currency === 'USD' ? '$' : '€'}
             isMobile={isMobile}
+          />
+        )}
+        {showRolePinModal && (
+          <RolePinModal
+            t={t}
+            isMobile={isMobile}
+            onClose={() => setShowRolePinModal(false)}
+            onUnlock={() => {
+              setRole("admin");
+              setShowRolePinModal(false);
+            }}
           />
         )}
         {showExportModal && (
